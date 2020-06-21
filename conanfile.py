@@ -6,7 +6,7 @@ class FastDDSConan(ConanFile):
     version = "2.0.0"
     license = "Apache License 2.0"
     author = "Frieder Pankratz"
-    url = "<Package recipe repository url here, for issues about the package>"
+    url = "https://github.com/TUM-CONAN/conan-fast-dds.git"
     description = "Conan wrapper for Fast-DDS"    
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
