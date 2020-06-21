@@ -1,5 +1,5 @@
 from conans import ConanFile, CMake, tools
-
+import os, shutil
 
 class FastDDSConan(ConanFile):
     name = "Fast-DDS"
@@ -38,11 +38,9 @@ set(TINYXML2_LIBRARY ${CONAN_LIBS_TINYXML2})
 set(TINYXML2_INCLUDE_DIR ${CONAN_INCLUDE_DIRS_TINYXML2})
 ''')
 
-    def configure(self):
-        if self.options.shared:                        
-            self.options['tinyxml2'].shared = True
-            self.options['Fast-CDR'].shared = True
-            self.options['foonathan-memory'].shared = True
+    def configure(self):                        
+        self.options['tinyxml2'].shared = self.options.shared
+        self.options['Fast-CDR'].shared = self.options.shared
 
     def _configure_cmake(self):        
         cmake = CMake(self)
@@ -54,10 +52,16 @@ set(TINYXML2_INCLUDE_DIR ${CONAN_INCLUDE_DIRS_TINYXML2})
             var_value = "ON" if value_str == 'True' else "OFF" if value_str == 'False' else value_str
             cmake.definitions[var_name] = var_value
 
-        cmake.definitions["PROJECT_VERSION"] = self.version            
+        cmake.definitions["PROJECT_VERSION"] = self.version  
+
+        if self.options.shared:
+            cmake.definitions["EPROSIMA_ALL_DYN_LINK"] = ""
+            cmake.definitions["fastdds_EXPORTS"] = ""
+
 
         for option, value in self.options.items():
             add_cmake_option(option, value)
+
 
         cmake.configure()
         return cmake
@@ -72,3 +76,5 @@ set(TINYXML2_INCLUDE_DIR ${CONAN_INCLUDE_DIRS_TINYXML2})
 
     def package_info(self):        
         self.cpp_info.libs = tools.collect_libs(self)
+        if self.options.shared:
+            self.cpp_info.defines = ["EPROSIMA_ALL_DYN_LINK"]
