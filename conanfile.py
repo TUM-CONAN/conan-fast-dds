@@ -3,9 +3,9 @@ import os, shutil
 
 class FastDDSConan(ConanFile):
     name = "Fast-DDS"
-    version = "2.0.0"
+    version = "2.8.1"
     license = "Apache License 2.0"
-    author = "Frieder Pankratz"
+    author = "Frieder Pankratz / Ulrich Eck"
     url = "https://github.com/TUM-CONAN/conan-fast-dds.git"
     description = "Conan wrapper for Fast-DDS"    
     settings = "os", "compiler", "build_type", "arch"
@@ -13,7 +13,12 @@ class FastDDSConan(ConanFile):
     default_options = {"shared": True}
     generators = "cmake"
 
-    requires = ("Fast-CDR/1.0.14@camposs/stable","foonathan-memory/1.0.0@camposs/stable", "asio/1.16.1", "tinyxml2/8.0.0")
+    requires = (
+        "Fast-CDR/1.0.25@camposs/stable",
+        "foonathan-memory/0.7-2@camposs/stable", 
+        "asio/1.24.0", 
+        "tinyxml2/8.0.0"
+        )
     
 
     def source(self):
@@ -23,20 +28,13 @@ class FastDDSConan(ConanFile):
         # This small hack might be useful to guarantee proper /MT /MD linkage
         # in MSVC if the packaged project doesn't have variables to set it
         # properly        
-        tools.replace_in_file("CMakeLists.txt", "project(fastrtps VERSION \"${PROJECT_VERSION}\" LANGUAGES C CXX)",
-                              '''project(fastrtps VERSION "${PROJECT_VERSION}" LANGUAGES C CXX)
+        tools.replace_in_file("CMakeLists.txt", "project(fastrtps VERSION \"%s\" LANGUAGES C CXX)" % self.version,
+                              '''project(fastrtps VERSION "%s" LANGUAGES C CXX)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 set(TINYXML2_LIBRARY ${CONAN_LIBS_TINYXML2})
 set(TINYXML2_INCLUDE_DIR ${CONAN_INCLUDE_DIRS_TINYXML2})
-''')
-        tools.replace_in_file("CMakeLists.txt", "project(fastrtps VERSION \"${LIB_VERSION_STR}\" LANGUAGES C CXX)",
-                              '''project(fastrtps VERSION "${LIB_VERSION_STR}" LANGUAGES C CXX)
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
-set(TINYXML2_LIBRARY ${CONAN_LIBS_TINYXML2})
-set(TINYXML2_INCLUDE_DIR ${CONAN_INCLUDE_DIRS_TINYXML2})
-''')
+''' % self.version)
 
     def configure(self):                        
         self.options['tinyxml2'].shared = self.options.shared
