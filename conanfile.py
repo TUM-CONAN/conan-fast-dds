@@ -3,14 +3,18 @@ import os, shutil
 
 class FastDDSConan(ConanFile):
     name = "Fast-DDS"
-    version = "2.8.1"
+    version = "2.9.0"
     license = "Apache License 2.0"
     author = "Frieder Pankratz / Ulrich Eck"
     url = "https://github.com/TUM-CONAN/conan-fast-dds.git"
     description = "Conan wrapper for Fast-DDS"    
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False]}
-    default_options = {"shared": True}
+    options = {
+        "shared": [True, False],
+    }
+    default_options = {
+        "shared": True,
+        }
     generators = "cmake"
 
     requires = (
@@ -50,7 +54,8 @@ set(TINYXML2_INCLUDE_DIR ${CONAN_INCLUDE_DIRS_TINYXML2})
             var_value = "ON" if value_str == 'True' else "OFF" if value_str == 'False' else value_str
             cmake.definitions[var_name] = var_value
 
-        cmake.definitions["PROJECT_VERSION"] = self.version  
+        cmake.definitions["PROJECT_VERSION"] = self.version 
+        cmake.definitions["LOG_NO_INFO"] = "OFF"
 
         if self.options.shared:
             cmake.definitions["EPROSIMA_ALL_DYN_LINK"] = ""
